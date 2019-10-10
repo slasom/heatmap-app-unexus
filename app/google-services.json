@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "557806016821",
+    "firebase_url": "https://heatmapv2.firebaseio.com",
+    "project_id": "heatmapv2",
+    "storage_bucket": "heatmapv2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:557806016821:android:d0570fede26686c9",
+        "android_client_info": {
+          "package_name": "com.spilab.heatmapv2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "557806016821-tk33uerjvlfdbrhbjkjtd9i110qkr59m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.spilab.heatmapv2",
+            "certificate_hash": "02f3ff38883de21b778e17fb4f27710e27a42ece"
+          }
+        },
+        {
+          "client_id": "557806016821-jkklekknr5t4kjpue0kspkm10g4cjq4u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBRlVsOr5pWXIEvuqJrm0bo_0nQQSwGh9k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "557806016821-jkklekknr5t4kjpue0kspkm10g4cjq4u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
