@@ -1,37 +1,21 @@
-package com.spilab.heatmapv2.service;
+package com.spilab.heatmapv3.service;
 
 
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.location.Location;
-import android.os.Build;
 import android.os.Environment;
-import android.support.annotation.NonNull;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
-import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
-import android.util.TimingLogger;
-import android.widget.Toast;
 
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import android.util.Log;
+
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.spilab.heatmapv2.MainActivity;
-import com.spilab.heatmapv2.R;
-import com.spilab.heatmapv2.resource.DeviceResource;
-import com.spilab.heatmapv2.resource.HeatMapResource;
-import com.spilab.heatmapv2.response.DeviceResponse;
-import com.spilab.heatmapv2.response.HeatMapResponse;
+import com.spilab.heatmapv3.resource.DeviceResource;
+import com.spilab.heatmapv3.resource.HeatMapResource;
+import com.spilab.heatmapv3.response.DeviceResponse;
+import com.spilab.heatmapv3.response.HeatMapResponse;
 
 
 import java.io.BufferedWriter;
@@ -41,7 +25,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Calendar;
 import java.util.Map;
-import java.util.Random;
 
 
 public class FirebaseService extends FirebaseMessagingService {
@@ -91,13 +74,11 @@ public class FirebaseService extends FirebaseMessagingService {
 
                     HeatMapResponse mapresponse = gson.fromJson(String.valueOf(data), HeatMapResponse.class);
 
-
                     new HeatMapResource(getApplicationContext()).executeMethod(mapresponse);
 
                     long difference = System.currentTimeMillis() - startTime;
 
                     writeFileExternalStorage(mapresponse.getIdRequest(),mapresponse.getMethod(),difference);
-
 
                     Log.d("TIME Execution: ", String.valueOf(difference) +" ms");
                     //TODO Choose what type of notification to show (toast or notification in the bar)
@@ -114,18 +95,15 @@ public class FirebaseService extends FirebaseMessagingService {
 
                     DeviceResponse deviceresponse = gson.fromJson(String.valueOf(data), DeviceResponse.class);
 
-                    //SEND TO MAINACTIVITY
-                    Intent intentProfile = new Intent();
-                    intentProfile.putExtra("timeout", deviceresponse.getParams().gettimeout());
-                    intentProfile.setAction("RESTART");
-                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intentProfile);
+                    new DeviceResource(getApplicationContext()).executeMethod(deviceresponse);
+
+
 
                     //new DeviceResource(getApplicationContext()).executeMethod(deviceresponse);
 
                     long difference = System.currentTimeMillis() - startTime;
 
-                    writeFileExternalStorage(deviceresponse.getIdRequest(),deviceresponse.getMethod(),difference);
-
+                    //writeFileExternalStorage(deviceresponse.getIdRequest(),deviceresponse.getMethod(),difference);
 
                     Log.d("TIME Execution: ", String.valueOf(difference) +" ms");
                     //TODO Choose what type of notification to show (toast or notification in the bar)
@@ -136,7 +114,6 @@ public class FirebaseService extends FirebaseMessagingService {
                 }
 
                 break;
-
 
         }
     }
@@ -151,9 +128,10 @@ public class FirebaseService extends FirebaseMessagingService {
 
             String request= id+","+ Calendar.getInstance().getTime()+","+method+","+time+"\n";
 
+            Log.d("HeatmapLog: ", request);
 
             Writer output;
-            output = new BufferedWriter(new FileWriter(myExternalFile+ File.separator + "request.csv",true));  //clears file every time
+            output = new BufferedWriter(new FileWriter(myExternalFile+ File.separator + "request.txt",true));  //clears file every time
             output.append(request);
             output.close();
 

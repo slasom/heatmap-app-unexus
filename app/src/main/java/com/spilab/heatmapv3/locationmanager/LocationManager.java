@@ -1,19 +1,24 @@
-package com.spilab.heatmapv2.locationmanager;
+package com.spilab.heatmapv3.locationmanager;
 
 import android.graphics.PointF;
+import android.os.Build;
 import android.util.Log;
 
-import com.spilab.heatmapv2.database.LocationBeanRealm;
-import com.spilab.heatmapv2.database.LocationBeanRealmModule;
-import com.spilab.heatmapv2.model.LocationFrequency;
-import com.spilab.heatmapv2.database.LocationFrequencyModule;
+import androidx.annotation.RequiresApi;
+
+import com.spilab.heatmapv3.database.LocationBeanRealm;
+import com.spilab.heatmapv3.database.LocationBeanRealmModule;
+import com.spilab.heatmapv3.model.LocationFrequency;
+import com.spilab.heatmapv3.database.LocationFrequencyModule;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
@@ -202,6 +207,48 @@ public class LocationManager {
             }
         }
         return locationFreqs;
+
+
+//        Log.e("llega","llega");
+//        HashMap<Double,HashMap<Double,Integer>> hmm = new HashMap<>();
+//
+//        Log.e("llega1","llega");
+//
+//        for (LocationFrequency location : locations) {
+//            if(hmm.isEmpty()){
+//                hmm.put(location.getLatitude(), (HashMap<Double, Integer>) new HashMap().put(location.getLatitude(), location.getFrequency()));
+//            }
+//                if (hmm.containsKey(location.getLatitude()) ) {
+//                    if (hmm.get(location.getLatitude()).containsKey(location.getLongitude())) {
+//                        hmm.get(location.getLatitude()).put(location.getLongitude(),
+//                                hmm.get(location.getLatitude()).get(location.getLongitude()) + location.getFrequency());
+//                    }
+//                    else {
+//                        hmm.get(location.getLatitude()).put(location.getLongitude(), location.getFrequency());
+//                    }
+//                }
+//                else {
+//
+//                    hmm.put(location.getLatitude(), (HashMap<Double, Integer>) new HashMap().put(location.getLatitude(), location.getFrequency()));
+//                }
+//        }
+//
+//        Log.e("llega2","llega2");
+//
+//        List<LocationFrequency> heatmap =  new ArrayList<>();
+//
+//        for (Map.Entry<Double,HashMap<Double,Integer>> entry : hmm.entrySet()){
+//            for (Map.Entry<Double,Integer> entry2 : entry.getValue().entrySet()){
+//                heatmap.add(new LocationFrequency(entry.getKey(),entry2.getKey(),entry2.getValue()));
+//            }
+//        }
+//
+//
+//        return heatmap;
+
+
+
+
     }
 
     public static LocationFrequency searchLocation (List<LocationFrequency> locations, LocationFrequency location){

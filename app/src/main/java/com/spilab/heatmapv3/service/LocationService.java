@@ -1,46 +1,4 @@
-package com.spilab.heatmapv2.service;
-
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.Service;
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.Color;
-import android.location.Location;
-import android.os.Build;
-import android.os.Environment;
-import android.os.IBinder;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
-import android.widget.Toast;
-
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.spilab.heatmapv2.database.LocationBeanRealm;
-import com.spilab.heatmapv2.database.LocationBeanRealmModule;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import io.realm.Realm;
-import io.realm.RealmConfiguration;
+package com.spilab.heatmapv3.service;
 
 public class LocationService /*extends Service*/ {
 

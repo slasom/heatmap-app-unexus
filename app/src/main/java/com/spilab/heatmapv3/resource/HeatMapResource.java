@@ -10,12 +10,10 @@
  * Do not edit the class manually.
  */
 
-package com.spilab.heatmapv2.resource;
+package com.spilab.heatmapv3.resource;
 
 
 import android.content.Context;
-import android.os.AsyncTask;
-import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -27,26 +25,17 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.spilab.heatmapv2.database.LocationBeanRealm;
-import com.spilab.heatmapv2.locationmanager.LocationManager;
-import com.spilab.heatmapv2.model.LocationFrequency;
-import com.spilab.heatmapv2.response.HeatMapResponse;
+import com.spilab.heatmapv3.database.LocationBeanRealm;
+import com.spilab.heatmapv3.locationmanager.LocationManager;
+import com.spilab.heatmapv3.model.LocationFrequency;
+import com.spilab.heatmapv3.response.HeatMapResponse;
 
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -94,25 +83,14 @@ public class HeatMapResource {
      * @param devices number of devices
      * @return List<LocationFrequency>
      */
-    public List<LocationFrequency> getMCHeatmaps (Date beginDate, Date endDate, Double latitude, Double longitude, Double radius, Integer devices){
-
-        Log.e("DATOS RECIBIDOS:", beginDate+", "+endDate+", "+latitude+", "+longitude+", "+radius);
+    public void getMCHeatmaps (Date beginDate, Date endDate, Double latitude, Double longitude, Double radius, Integer devices){
 
         List<LocationFrequency> locations = LocationManager.getLocationHistory(beginDate, endDate, latitude, longitude, radius);
-        List<List<LocationFrequency>> locationLists = partition(locations, 25);
-
-
-
-        for (List<LocationFrequency> list : locationLists) {
-            try {
-                Log.e("Location Size", String.valueOf(list.size()));
-                sendReply(mapResponse.getSender(), mapResponse.getIdRequest(),new JSONArray(gson.toJson(list)), devices);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+        try {
+            sendReply(mapResponse.getSender(), mapResponse.getIdRequest(),new JSONArray(gson.toJson(locations)), devices);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-
-        return null;
     }
 
     /**

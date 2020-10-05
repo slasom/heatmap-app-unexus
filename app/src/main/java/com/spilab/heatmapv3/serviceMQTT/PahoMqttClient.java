@@ -1,7 +1,7 @@
-package com.spilab.heatmapv2.serviceMQTT;
+package com.spilab.heatmapv3.serviceMQTT;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
@@ -75,7 +75,7 @@ public class PahoMqttClient {
     @NonNull
     private MqttConnectOptions getMqttConnectionOption() {
         MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
-        mqttConnectOptions.setCleanSession(false);
+        mqttConnectOptions.setCleanSession(true);
         mqttConnectOptions.setAutomaticReconnect(true);
         //mqttConnectOptions.setWill(Constants.PUBLISH_TOPIC, "I am going offline".getBytes(), 1, true);
         //mqttConnectOptions.setUserName("ngbllzzy");

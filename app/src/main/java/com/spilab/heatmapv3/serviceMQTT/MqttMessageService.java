@@ -1,4 +1,4 @@
-package com.spilab.heatmapv2.serviceMQTT;
+package com.spilab.heatmapv3.serviceMQTT;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -9,22 +9,29 @@ import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.NotificationCompat;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.identifier.AdvertisingIdClient;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.spilab.heatmapv2.MainActivity;
-import com.spilab.heatmapv2.R;
-import com.spilab.heatmapv2.resource.HeatMapResource;
-import com.spilab.heatmapv2.response.HeatMapResponse;
+import com.spilab.heatmapv3.MainActivity;
+import com.spilab.heatmapv3.R;
+import com.spilab.heatmapv3.resource.DeviceResource;
+import com.spilab.heatmapv3.resource.HeatMapResource;
+import com.spilab.heatmapv3.response.DeviceResponse;
+import com.spilab.heatmapv3.response.HeatMapResponse;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -34,15 +41,16 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.net.NetworkInterface;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.io.Writer;
+import java.util.Calendar;
 import java.util.Random;
+import java.util.UUID;
 
 
 public class MqttMessageService extends Service {
@@ -51,10 +59,14 @@ public class MqttMessageService extends Service {
     private PahoMqttClient pahoMqttClient;
     private MqttAndroidClient mqttAndroidClient;
     public static Boolean subscribed = false;
+    private static Boolean connectionLost = false;
+
+    //Client ID
+    private AdvertisingIdClient.Info mInfo;
 
     private String profile ;
     Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").create();
-
+    private static final String CARPETA_RAIZ = "HeatmapV3/";
     public MqttMessageService() {
     }
 
@@ -63,6 +75,15 @@ public class MqttMessageService extends Service {
         super.onCreate();
         Log.d(TAG, "onCreate");
 
+        mInfo = null;
+        //GetAdvertisingID
+       // new GetAdvertisingID().execute();
+
+        configureMQTT();
+
+    }
+
+    private void configureMQTT(){
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
             startMyOwnForeground();
         else
@@ -71,12 +92,13 @@ public class MqttMessageService extends Service {
         pahoMqttClient = new PahoMqttClient();
 
 
-        mqttAndroidClient = pahoMqttClient.getMqttClient(getApplicationContext(), Constants.MQTT_BROKER_URL, Constants.CLIENT_ID);
+        mqttAndroidClient = pahoMqttClient.getMqttClient(getApplicationContext(), MQTTConfiguration.MQTT_BROKER_URL, UUID.randomUUID().toString());
+        //Log.e("IDDDDD: ", UUID.randomUUID().toString());
 
         mqttAndroidClient.setCallback(new MqttCallbackExtended() {
             @Override
             public void connectComplete(boolean b, String s) {
-                if (!subscribed) {
+                if (!subscribed || connectionLost) {
                     subscribeTopic(getApplicationContext(), "HeatmapAPI");
                     Log.d(TAG, "Subscribed to request");
                 }
@@ -85,7 +107,8 @@ public class MqttMessageService extends Service {
             @Override
             public void connectionLost(Throwable throwable) {
                 Log.d(TAG, "Service connection lost");
-                subscribeTopic(getApplicationContext(), "HeatmapAPI");
+                connectionLost = true;
+                //subscribeTopic(getApplicationContext(), "HeatmapAPI");
             }
 
             @Override
@@ -117,23 +140,75 @@ public class MqttMessageService extends Service {
 
             }
         });
+    }
 
 
+    private class GetAdvertisingID extends AsyncTask<Void, Void, AdvertisingIdClient.Info> {
+
+        @Override
+        protected AdvertisingIdClient.Info doInBackground(Void... voids) {
+            AdvertisingIdClient.Info info = null;
+            try {
+                info = AdvertisingIdClient.getAdvertisingIdInfo(getApplicationContext());
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (GooglePlayServicesNotAvailableException e) {
+                e.printStackTrace();
+            } catch (GooglePlayServicesRepairableException e) {
+                e.printStackTrace();
+            }
+            return info;
+        }
+
+        @Override
+        protected void onPostExecute(AdvertisingIdClient.Info info) {
+            mInfo = info;
+
+            configureMQTT();
+        }
     }
 
 /////
     private void executeAPI(JSONObject data) throws JSONException {
         Log.i("switch", data.getString("resource"));
+        long startTime = System.currentTimeMillis();
+
         switch (data.getString("resource")) {
 
             case "Map":
                 try {
 
+
+
                     HeatMapResponse mapresponse = gson.fromJson(String.valueOf(data), HeatMapResponse.class);
                     new HeatMapResource(getApplicationContext()).executeMethod(mapresponse);
 
+                    long difference = System.currentTimeMillis() - startTime;
+                    writeFileExternalStorageComplete(mapresponse.getIdRequest(),mapresponse.getMethod(),difference);
+
                     //TODO Choose what type of notification to show (toast or notification in the bar)
-                    showNotification("Resource Execution: " + mapresponse.getResource(), " Method: " + mapresponse.getMethod());
+                    //showNotification("Resource Execution: " + mapresponse.getResource(), " Method: " + mapresponse.getMethod());
+
+                } catch (Exception e) {
+                    Log.e("Error MapResponse", e.getMessage());
+                }
+
+                break;
+            case "Device":
+                try {
+
+
+                    DeviceResponse deviceresponse = gson.fromJson(String.valueOf(data), DeviceResponse.class);
+
+                    new DeviceResource(getApplicationContext()).executeMethod(deviceresponse);
+
+                    long difference = System.currentTimeMillis() - startTime;
+
+
+
+                    Log.d("TIME Execution: ", String.valueOf(difference) +" ms");
+                    //TODO Choose what type of notification to show (toast or notification in the bar)
+                    //showNotification("Resource Execution: " + deviceresponse.getResource(), " Method: " + deviceresponse.getMethod());
 
                 } catch (Exception e) {
                     Log.e("Error MapResponse", e.getMessage());
@@ -146,11 +221,59 @@ public class MqttMessageService extends Service {
     }
 
 
+    private void writeFileExternalStorageComplete(String id, String method, long time) {
+
+//        try {
+            //File myExternalFile = new File(Environment.getExternalStorageDirectory(), CARPETA_RAIZ);
+
+//            if (!myExternalFile.exists())
+//                myExternalFile.mkdir();
+
+            String request= id+","+ Calendar.getInstance().getTime()+","+method+","+time+"\n";
+
+            Log.d("HeatmapLog: ", request);
+//            Writer output;
+//            output = new BufferedWriter(new FileWriter(myExternalFile+ File.separator + "request.txt",true));  //clears file every time
+//            output.append(request);
+//            output.close();
+//
+//            Log.d(TAG, " - File WRITED successfully");
+
+//        } catch (IOException e) {
+//            Log.d(TAG, " - Error LOADED file");
+//            e.printStackTrace();
+//        }
+
+    }
+
+    private void  writeFileExternalStorageIncomplete(String id, String method){
+        try {
+            File myExternalFile = new File(Environment.getExternalStorageDirectory(), CARPETA_RAIZ);
+
+            if (!myExternalFile.exists())
+                myExternalFile.mkdir();
+
+            String request= id+","+ Calendar.getInstance().getTime()+","+method+"\n";
+
+
+            Writer output;
+            output = new BufferedWriter(new FileWriter(myExternalFile+ File.separator + "request-incomplete.csv",true));  //clears file every time
+            output.append(request);
+            output.close();
+
+            Log.d(TAG, " - File WRITED successfully");
+
+        } catch (IOException e) {
+            Log.d(TAG, " - Error LOADED file");
+            e.printStackTrace();
+        }
+    }
+
     private void showNotification(String title, String body) {
 
         //Intent to open APP when click in the notification.
         Intent resultIntent = new Intent(this, MainActivity.class);
-        android.support.v4.app.TaskStackBuilder stackBuilder = android.support.v4.app.TaskStackBuilder.create(this);
+        androidx.core.app.TaskStackBuilder stackBuilder = androidx.core.app.TaskStackBuilder.create(this);
         stackBuilder.addNextIntentWithParentStack(resultIntent);
         PendingIntent resultPendingIntent =
                 stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -255,29 +378,6 @@ public class MqttMessageService extends Service {
         }
     }
 
-    private void sendProfile() {
-        //Log.d(TAG," - Sending..."+profile);
-        if (profile.equals("")) {
-            Toast.makeText(this, "The profile is empty. Nothing to send.", Toast.LENGTH_SHORT).show();
-            Log.d(TAG, " - The profile is empty. Nothing to send.");
-        } else {
-            Log.d(TAG, " - REQ: Sending profile to " + Constants.MQTT_BROKER_URL);
-            try {
-                //Constants.MQTT_BROKER_URL = "tcp://" + txtServerIp.getText().toString() + ":1883";
-                //Log.d(TAG, "IP=" + Constants.MQTT_BROKER_URL);
-                pahoMqttClient.publishMessage(mqttAndroidClient, profile, 1, Constants.PUBLISH_TOPIC);
-
-//                Intent intent = new Intent(ctx, MqttMessageService.class);
-//                ctx.startService(intent);
-
-                //Toast.makeText(ctx, "Profile sent successfully.", Toast.LENGTH_SHORT).show();
-                Log.d(TAG, " - REQ: Profile sent successfully.");
-            } catch (Exception e) {
-                //Toast.makeText(ctx, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.d(TAG, " - REQ: Error sending the profile: " + e.getMessage());
-            }
-        }
-    }
 
     private void readFileExternalStorage(File myExternalFile) {
         try {
@@ -302,30 +402,5 @@ public class MqttMessageService extends Service {
         }
     }
 
-    private String getMacAddressUpdated() {
-        try {
-            List<NetworkInterface> all = Collections.list(NetworkInterface.getNetworkInterfaces());
-            for (NetworkInterface nif : all) {
-                if (!nif.getName().equalsIgnoreCase("wlan0")) continue;
 
-                byte[] macBytes = nif.getHardwareAddress();
-                if (macBytes == null) {
-                    return "";
-                }
-
-                StringBuilder res1 = new StringBuilder();
-                for (byte b : macBytes) {
-                    res1.append(Integer.toHexString(b & 0xFF) + ":");
-                }
-
-                if (res1.length() > 0) {
-                    res1.deleteCharAt(res1.length() - 1);
-                }
-                return res1.toString();
-            }
-        } catch (Exception ex) {
-            //handle exception
-        }
-        return "";
-    }
 }

@@ -1,4 +1,4 @@
-package com.spilab.heatmapv2.response;
+package com.spilab.heatmapv3.response;
 
 
 import com.google.gson.annotations.SerializedName;
@@ -55,12 +55,12 @@ public class HeatMapResponse {
         this.params = params;
     }
 
-    public String getSender() {
-        return sender;
-    }
-
     public void setSender(String sender) {
         this.sender = sender;
+    }
+
+    public String getSender() {
+        return sender;
     }
 
     public class Params {

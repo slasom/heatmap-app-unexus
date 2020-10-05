@@ -1,4 +1,4 @@
-package com.spilab.heatmapv2;
+package com.spilab.heatmapv3;
 
 import org.junit.Test;
 

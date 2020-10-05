@@ -1,4 +1,4 @@
-package com.spilab.heatmapv2.serviceMQTT;
+package com.spilab.heatmapv3.serviceMQTT;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

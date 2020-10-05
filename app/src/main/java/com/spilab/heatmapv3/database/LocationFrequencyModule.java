@@ -1,6 +1,6 @@
-package com.spilab.heatmapv2.database;
+package com.spilab.heatmapv3.database;
 
-import com.spilab.heatmapv2.model.LocationFrequency;
+import com.spilab.heatmapv3.model.LocationFrequency;
 
 import io.realm.annotations.RealmModule;
 

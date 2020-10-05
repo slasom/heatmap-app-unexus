@@ -1,4 +1,4 @@
-package com.spilab.heatmapv2.model;
+package com.spilab.heatmapv3.model;
 
 import io.realm.RealmModel;
 import io.realm.annotations.RealmClass;

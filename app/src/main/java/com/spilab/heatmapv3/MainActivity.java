@@ -1,4 +1,4 @@
-package com.spilab.heatmapv2;
+package com.spilab.heatmapv3;
 
 import android.Manifest;
 import android.app.ActivityManager;
@@ -9,28 +9,37 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.os.Environment;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.telecom.Call;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.maps.CameraUpdateFactory;
+import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkResponse;
+import com.android.volley.ParseError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.HttpHeaderParser;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.TileOverlay;
-import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -39,39 +48,48 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import com.google.maps.android.heatmaps.HeatmapTileProvider;
-import com.google.maps.android.heatmaps.WeightedLatLng;
-import com.spilab.heatmapv2.database.LocationBeanRealm;
-import com.spilab.heatmapv2.database.LocationBeanRealmModule;
-import com.spilab.heatmapv2.locationmanager.LocationManager;
-import com.spilab.heatmapv2.model.LocationFrequency;
-import com.spilab.heatmapv2.service.LocationService;
-import com.spilab.heatmapv2.serviceMQTT.Constants;
-import com.spilab.heatmapv2.serviceMQTT.MqttMessageService;
+import com.spilab.heatmapv3.database.LocationBeanRealm;
+import com.spilab.heatmapv3.database.LocationBeanRealmModule;
+import com.spilab.heatmapv3.service.LocationService;
+import com.spilab.heatmapv3.serviceMQTT.MQTTConfiguration;
+import com.spilab.heatmapv3.serviceMQTT.MqttMessageService;
+
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Timer;
+import java.util.Map;
+import java.util.UUID;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Callback;
 
 
 public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallback*/ {
 
 
+    private static final String TYPE_UTF8_CHARSET = "UTF-8";
     private LatLng miPosicion = new LatLng(0, 0);
     private Date currentTime;
     private GoogleMap mMap;
-    private boolean flag=false;
+    private boolean flag = false;
 
     private TileOverlay tileOverlay;
 
@@ -89,7 +107,7 @@ public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallb
     private Button buttonGetLocations;
 
 
-    private static final String CARPETA_RAIZ = "HeatmapV2/";
+    private static final String CARPETA_RAIZ = "HeatmapV3/";
 
     private Intent locationIntent;
 
@@ -100,7 +118,7 @@ public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallb
 
     private static String serverIp;
 
-    private boolean startRealm=false;
+    private boolean startRealm = false;
 
     private Button restart;
 
@@ -127,14 +145,18 @@ public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallb
 //        mServiceIntent = new Intent(this, service.getClass());
 
 
-        getLocationPermission();
+        //getLocationPermission();
         getStoragePermission();
 
         getTokenFirebase();
         subscribeTopicFirebase("HeatmapAPI");
+        startServiceMQTT();
+
+
+
 
         gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").create();
-        restart= findViewById(R.id.button);
+        restart = findViewById(R.id.button);
 
         restart.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -146,8 +168,22 @@ public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallb
 
         /////// PARSE LOCALIZACIONES ESTATICAS //////////////
         ArrayList<LocationBeanRealm> localizaciones = new ArrayList<>();
-        String result=loadJSONFromAsset();
-        localizaciones= gson.fromJson(result,new TypeToken<List<LocationBeanRealm>>(){}.getType());
+
+        //GET FICHERO SIMULACION
+
+        String simulationName = getIntent().getStringExtra("param");
+        String result;
+        if (simulationName == null) {
+
+            Log.e("Error: ", "No se ha introducido ningún nombre para la simulacion");
+            result = loadJSONFromAsset("locs.json");
+            Log.e("SIMULATION NAME: ", "locs");
+        } else {
+            Log.e("SIMULATION NAME: ", simulationName);
+            result = loadJSONFromAsset(simulationName + ".json");
+        }
+        localizaciones = gson.fromJson(result, new TypeToken<List<LocationBeanRealm>>() {
+        }.getType());
 
         Log.e("LISTA LOCALIZACIONES: ", String.valueOf(localizaciones.size()));
 
@@ -162,7 +198,7 @@ public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallb
 //
 //                startService(mServiceIntent);
 //
-//                startServiceMQTT();
+            startServiceMQTT();
 //
 //
 //                //initMap();
@@ -176,6 +212,13 @@ public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallb
 
     }
 
+    //@Multipart
+    //    @POST("files/dataset/{namefile}")
+    //    Call<ResponseBody> uploadDataset(@Path("namefile") String namefile, @Part MultipartBody.Part dataset);
+
+
+
+
     public void restartAPP(Double timeout){
         Intent mStartActivity = new Intent(getApplicationContext(), MainActivity.class);
         int mPendingIntentId = 123456;
@@ -186,10 +229,14 @@ public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallb
     }
 
 
-    public String loadJSONFromAsset() {
+
+
+
+
+    public String loadJSONFromAsset(String filename) {
         String json = null;
         try {
-            InputStream is = getAssets().open("locs.json");
+            InputStream is = getAssets().open(filename);
             int size = is.available();
             byte[] buffer = new byte[size];
             is.read(buffer);
@@ -200,6 +247,32 @@ public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallb
             return null;
         }
         return json;
+    }
+
+
+    private void writeFileExternalStorage(Double lat, Double lng) {
+
+        try {
+            File myExternalFile = new File(Environment.getExternalStorageDirectory(), CARPETA_RAIZ);
+
+            if (!myExternalFile.exists())
+                myExternalFile.mkdir();
+
+            String request= "new google.maps.LatLng("+lat+","+lng+"),\n";
+
+
+            Writer output;
+            output = new BufferedWriter(new FileWriter(myExternalFile+ File.separator + "example.txt",true));  //clears file every time
+            output.append(request);
+            output.close();
+
+            Log.d(TAG, " - File WRITED successfully");
+
+        } catch (IOException e) {
+            Log.d(TAG, " - Error LOADED file");
+            e.printStackTrace();
+        }
+
     }
 
     public void guardarLocsStaticas(ArrayList<LocationBeanRealm> localizaciones) {
@@ -231,6 +304,8 @@ public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallb
 
         for (int i = 0; i < localizaciones.size(); i++) {
 
+            //writeFileExternalStorage(localizaciones.get(i).getLat(),localizaciones.get(i).getLng());
+
             realm.beginTransaction();
             LocationBeanRealm lbr = realm.createObject(LocationBeanRealm.class);
             lbr.setLat(localizaciones.get(i).getLat());
@@ -252,25 +327,25 @@ public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallb
 
     }
 
-//    private void startServiceMQTT() {
-//        serverIp = Constants.MQTT_BROKER_URL.split("//")[1].split(":")[0];
-//
-//        // Stopping service if running
-//        MqttMessageService service = new MqttMessageService();
-//        mServiceIntent = new Intent(this, service.getClass());
-//
-//       // mServiceIntent.putExtra("profile", profile);
-//
-//        boolean run = isMyServiceRunning(service.getClass());
-//          Log.d(TAG, " - Run1: " + run);
-//          if (!isMyServiceRunning(service.getClass())) {
-//              //mServiceIntent.putExtra("profile", profile);
-//            startService(mServiceIntent);
-//
-//          }
-//          Log.d(TAG, " - Run1: " + run);
-//
-//    }
+    private void startServiceMQTT() {
+        serverIp = MQTTConfiguration.MQTT_BROKER_URL.split("//")[1].split(":")[0];
+        // Stopping service if running
+        MqttMessageService service = new MqttMessageService();
+        mServiceIntent = new Intent(this, service.getClass());
+
+
+       // mServiceIntent.putExtra("profile", profile);
+
+        boolean run = isMyServiceRunning(service.getClass());
+          Log.d(TAG, " - Run1: " + run);
+          if (!isMyServiceRunning(service.getClass())) {
+              //mServiceIntent.putExtra("profile", profile);
+            startService(mServiceIntent);
+
+          }
+          Log.d(TAG, " - Run1: " + run);
+
+    }
 
     /**
      * Método para inicializar el mapa.
@@ -354,7 +429,7 @@ public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallb
 //                if (!isMyServiceRunning(service.getClass())) {
 //                    startService(mServiceIntent);
 //
-//                    startServiceMQTT();
+                    //startServiceMQTT();
 //                    //initMap();
 //                    Log.e("Service: ", "START Service");
 //                }
@@ -407,7 +482,7 @@ public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallb
 //                        if (!isMyServiceRunning(service.getClass())) {
 //                            startService(mServiceIntent);
 //
-//                            startServiceMQTT();
+                           // startServiceMQTT();
 //                            initMap();
 //                        }
 
@@ -507,17 +582,17 @@ public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallb
 //    }
 
 
-//    private boolean isMyServiceRunning(Class<?> serviceClass) {
-//        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-//        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-//            if (serviceClass.getName().equals(service.service.getClassName())) {
-//                Log.i("Service status", "Running");
-//                return true;
-//            }
-//        }
-//        Log.i("Service status", "Not running");
-//        return false;
-//    }
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                Log.i("Service status", "Running");
+                return true;
+            }
+        }
+        Log.i("Service status", "Not running");
+        return false;
+    }
 
 
 //    @Override
