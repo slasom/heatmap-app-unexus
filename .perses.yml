@@ -8,6 +8,7 @@ author: "spilab"
 
 ######### EC2 Configuration #########
 
+
 #Instance AWS type: Only compatible with machines that support kvm virtualization -> https://help.ubuntu.com/community/KVM/Installation.
 instance_type: "c5.metal"
 
