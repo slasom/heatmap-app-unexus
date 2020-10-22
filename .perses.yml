@@ -38,7 +38,7 @@ ram_devices: "4g"
 android_version: "9"
 
 #Application Id of Android App (can find it in the 'build.graddle' file of the application).
-application_id: "com.example.android.testing.espresso.BasicSample"
+application_id: "com.spilab.heatmapv3"
 
 #Time to wait for the deployment of Android devices (1m '1 minute', 1h '1 hour')
 #For example, for deploy 50 devices, wait 20m '20 minutes'
