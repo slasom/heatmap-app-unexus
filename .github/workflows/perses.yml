@@ -31,7 +31,7 @@ jobs:
         - name: "Build Android project"
           uses: vgaidarji/android-github-actions-build@v1.0.1
           with:
-            args: "./gradlew assembleDebug"
+            args: "./gradlew connectedAndroidTest"
         - run: ls -l ./app/build/outputs/apk/debug/app-debug.apk
         - run: ls -l ./app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
 
