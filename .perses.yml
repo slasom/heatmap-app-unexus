@@ -1,0 +1,88 @@
+############## PROJECT CONFIGURATION ##############
+
+#Project Name.
+project_name: "Perses Test"
+
+#Author: Name of the operator. Used as a prefix to avoid name collision on.
+author: "spilab"
+
+
+
+######### EC2 Configuration #########
+
+#Instance AWS type: Only compatible with machines that support kvm virtualization -> https://help.ubuntu.com/community/KVM/Installation.
+instance_type: "c5.metal"
+
+#AWS Region.
+region: "eu-west-1"
+
+######### Environment Configuration #########
+
+#APK path
+#apk_path: "C:/Users/usuario1/Downloads/testing-samples-master/ui/espresso/BasicSample/app/build/outputs/apk/debug/app-debug.apk"
+
+#APK Debug path. This apk is generated in the application directories and contains the instrumentation tests (espresso).
+#apk_test_path: "C:/Users/usuario1/Downloads/testing-samples-master/ui/espresso/BasicSample/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk"
+
+#Numbers of Android devices to deploy
+number_devices: "2"
+
+#Maximum CPU: maximum amount of available CPU resources each device can use
+#(We recommend a minimum of 1.5)
+cpu_devices: "2"
+
+#Maximum RAM:  maximum amount of memory each device can use
+#(We recommend a minimum of 3g '3GB').
+ram_devices: "4g"
+
+#Android version to use (6 to 10).
+android_version: "9"
+
+#Application Id of Android App (can find it in the 'build.graddle' file of the application).
+application_id: "com.example.android.testing.espresso.BasicSample"
+
+#Time to wait for the deployment of Android devices (1m '1 minute', 1h '1 hour')
+#For example, for deploy 50 devices, wait 20m '20 minutes'
+time_wait: "2m"
+
+
+######### Logs Configuration #########
+
+log_tags:
+  - "HeatmapLog"
+
+
+######### Tests Configuration #########
+
+# tests:
+#   - id: "test1"
+#     concurrentUsers: 3
+#     iterations: 5
+#     delay: 500
+#     url: "http://108.129.48.139/mqtt/mc/heatmaps?beginDate=2019-06-10T08:00:28Z&endDate=2019-06-10T20:56:28Z&latitude=37.378833&longitude=-5.970739&radius=600&devices=2&timeout=2500"
+#   - id: "test2"
+#     concurrentUsers: 3
+#     iterations: 5
+#     delay: 500
+#     url: "http://108.129.48.139/mqtt/mc/heatmaps?beginDate=2019-06-10T08:00:28Z&endDate=2019-06-10T20:56:28Z&latitude=37.378833&longitude=-5.970739&radius=600&devices=2&timeout=2500"
+
+tests:
+  - id: "GUI Performance"
+    type: "espresso"
+    expect:
+      total_execution:
+        under: 200
+  - id: "InternalPerformance1"
+    type: "custom"
+    config:
+      testPath: "test/mycustompersestest"
+  - id: "Observed Performnance1"
+    type: "apipecker"
+    config:
+      concurrentUsers: 3
+      iterations: 5
+      delay: 500
+      url: "http://108.129.48.139/mqtt/mc/heatmaps?beginDate=2019-06-10T08:00:28Z&endDate=2019-06-10T20:56:28Z&latitude=37.378833&longitude=-5.970739&radius=600&devices=2&timeout=2500"
+    expect:
+      mean:
+        under: 2000
