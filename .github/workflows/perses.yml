@@ -33,6 +33,7 @@ jobs:
           with:
             args: "./gradlew assembleDebug"
         - run: ls -l ./app/build/outputs/apk/debug/app-debug.apk
+        - run: ls -l ./app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
 
         # Build Perses config
         - name: Use Node.js 14.x
