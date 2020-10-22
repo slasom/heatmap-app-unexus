@@ -6,8 +6,6 @@ project_name: "Perses Test"
 #Author: Name of the operator. Used as a prefix to avoid name collision on.
 author: "spilab"
 
-
-
 ######### EC2 Configuration #########
 
 #Instance AWS type: Only compatible with machines that support kvm virtualization -> https://help.ubuntu.com/community/KVM/Installation.
@@ -51,20 +49,6 @@ time_wait: "2m"
 log_tags:
   - "HeatmapLog"
 
-
-######### Tests Configuration #########
-
-# tests:
-#   - id: "test1"
-#     concurrentUsers: 3
-#     iterations: 5
-#     delay: 500
-#     url: "http://108.129.48.139/mqtt/mc/heatmaps?beginDate=2019-06-10T08:00:28Z&endDate=2019-06-10T20:56:28Z&latitude=37.378833&longitude=-5.970739&radius=600&devices=2&timeout=2500"
-#   - id: "test2"
-#     concurrentUsers: 3
-#     iterations: 5
-#     delay: 500
-#     url: "http://108.129.48.139/mqtt/mc/heatmaps?beginDate=2019-06-10T08:00:28Z&endDate=2019-06-10T20:56:28Z&latitude=37.378833&longitude=-5.970739&radius=600&devices=2&timeout=2500"
 
 tests:
   - id: "GUI Performance"
