@@ -103,6 +103,7 @@ jobs:
         # Gather Test Result
         - name: "Gather Test Results"
           run: |
+            ls
             cat .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/resultsObservedPerformance1.txt
             tail -7 .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/resultsObservedPerformance1.txt > .resultsObservedPerformance1.json
             cat .resultsObservedPerformance1.json
