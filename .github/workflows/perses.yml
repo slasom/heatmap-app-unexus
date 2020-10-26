@@ -114,7 +114,9 @@ jobs:
         # Check Perses Result
         - name: "Check perses test result"
           run: |
-            cp .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/perses-tests.yaml .
+            cp .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/perses-tests.yaml .perses_gha/check/
+            find ./perses-tests.yaml
+            ls
             cd .perses_gha/check
             npm install
             npm start
