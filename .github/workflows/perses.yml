@@ -111,12 +111,12 @@ jobs:
             tail -7 .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/resultsObservedPerformance1.txt > .resultsObservedPerformance2.json
             cat .resultsObservedPerformance2.json
   
-#        # Check Perses Result
-#        - name: "Check perses test result"
-#          run: |
-#            cd .perses_gha/check
-#            npm install
-#            npm start
+        # Check Perses Result
+        - name: "Check perses test result"
+          run: |
+            cd .perses_gha/check
+            npm install
+            npm start
             
         
 #        # Setup yq parser for obtaing custom tests path

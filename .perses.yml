@@ -70,8 +70,8 @@ tests:
       url: "http://108.129.48.139/mqtt/mc/heatmaps?beginDate=2019-06-10T08:00:28Z&endDate=2019-06-10T20:56:28Z&latitude=37.378833&longitude=-5.970739&radius=600&devices=2&timeout=2500"
     expect:
       mean:
-        under: 2000
-  - id: "Observed Performance1"
+        under: 6000
+  - id: "Observed Performance2"
     type: "apipecker"
     config:
       concurrentUsers: 3
@@ -80,4 +80,4 @@ tests:
       url: "http://108.129.48.139/mqtt/mc/heatmaps?beginDate=2019-06-10T08:00:28Z&endDate=2019-06-10T20:56:28Z&latitude=37.378833&longitude=-5.970739&radius=600&devices=2&timeout=2500"
     expect:
       mean:
-        under: 2000
+        under: 6000
