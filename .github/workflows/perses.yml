@@ -115,13 +115,12 @@ jobs:
         - name: "Check perses test result"
           run: |
             cp .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/perses-tests.yaml .perses_gha/check/
-            find ./perses-tests.yaml
-            ls
             cd .perses_gha/check
+            ls
             npm install
             npm start
             
-        
+
 #        # Setup yq parser for obtaing custom tests path
 #        - name: "Setup parser for custom tests"
 #          run: |
