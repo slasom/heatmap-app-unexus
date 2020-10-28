@@ -101,18 +101,22 @@ jobs:
             ls -l .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/
             ls -l .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/devices-logs
         # Gather Test Result
-        - name: "Gather Test Results"
+        - name: "Gather Performance Test Results"
           run: |
             ls
-            tail -7 .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/resultsObservedPerformance1.txt > .resultsObservedPerformance1.json
-            cat .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/resultsObservedPerformance1.txt
-            echo "--------------------"
-            cat .resultsObservedPerformance1.json
-            echo "--------------------"
-            tail -7 .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/resultsObservedPerformance2.txt > .resultsObservedPerformance2.json
-            cat .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/resultsObservedPerformance2.txt
-            echo "--------------------"
-            cat .resultsObservedPerformance2.json
+            mdkir .perses_gha/check/logs
+            cp -r .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/ .perses_gha/check/logs/
+            cd .perses_gha/check
+            bash gatherResults.sh
+#            tail -7 .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/resultsObservedPerformance1.txt > .resultsObservedPerformance1.json
+#            cat .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/resultsObservedPerformance1.txt
+#            echo "--------------------"
+#            cat .resultsObservedPerformance1.json
+#            echo "--------------------"
+#            tail -7 .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/resultsObservedPerformance2.txt > .resultsObservedPerformance2.json
+#            cat .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/resultsObservedPerformance2.txt
+#            echo "--------------------"
+#            cat .resultsObservedPerformance2.json
   
         # Check Perses Result
         - name: "Check perses test result"
