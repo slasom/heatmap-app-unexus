@@ -107,8 +107,8 @@ jobs:
             cd .perses_gha/check
             ls
             echo "LOGSS"
+            bash gatherResults.sh
             ls logs/
-#            bash gatherResults.sh
 #            tail -7 .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/resultsObservedPerformance1.txt > .resultsObservedPerformance1.json
 #            cat .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/resultsObservedPerformance1.txt
 #            echo "--------------------"
