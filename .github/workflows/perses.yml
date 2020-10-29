@@ -119,6 +119,7 @@ jobs:
             cp .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/perses-tests.yaml .perses_gha/check/
             cd .perses_gha/check
             ls
+            ls logs/
             npm install
             npm start
 
