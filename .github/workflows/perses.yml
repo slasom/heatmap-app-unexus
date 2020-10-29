@@ -104,7 +104,7 @@ jobs:
         - name: "Gather Performance Test Results"
           run: |
             ls
-            mdkir .perses_gha/check/logs
+            mkdir .perses_gha/check/logs
             cp -r .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/ .perses_gha/check/logs/
             cd .perses_gha/check
             bash gatherResults.sh
