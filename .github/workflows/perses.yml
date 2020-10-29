@@ -112,11 +112,7 @@ jobs:
 #            cat .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/resultsObservedPerformance1.txt
 #            echo "--------------------"
 #            cat .resultsObservedPerformance1.json
-#            echo "--------------------"
-#            tail -7 .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/resultsObservedPerformance2.txt > .resultsObservedPerformance2.json
-#            cat .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/resultsObservedPerformance2.txt
-#            echo "--------------------"
-#            cat .resultsObservedPerformance2.json
+
   
         # Check Perses Result
         - name: "Check perses test result"
