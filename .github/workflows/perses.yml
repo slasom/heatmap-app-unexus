@@ -107,6 +107,8 @@ jobs:
             mkdir .perses_gha/check/logs
             cp -r .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/ .perses_gha/check/logs/
             cd .perses_gha/check
+            ls
+            ls ./logs/
             bash gatherResults.sh
 #            tail -7 .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/resultsObservedPerformance1.txt > .resultsObservedPerformance1.json
 #            cat .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/resultsObservedPerformance1.txt
