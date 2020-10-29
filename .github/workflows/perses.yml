@@ -106,6 +106,7 @@ jobs:
             cp -r .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/ .perses_gha/check/
             cd .perses_gha/check
             bash gatherResults.sh
+            ls logs/
 #            tail -7 .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/resultsObservedPerformance1.txt > .resultsObservedPerformance1.json
 #            cat .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/resultsObservedPerformance1.txt
 #            echo "--------------------"
@@ -117,6 +118,7 @@ jobs:
           run: |
             cp .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/perses-tests.yaml .perses_gha/check/
             cd .perses_gha/check
+            ls
             npm install
             npm start
 
