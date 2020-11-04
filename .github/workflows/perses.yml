@@ -100,26 +100,19 @@ jobs:
           run: |       
             ls -l .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/
             ls -l .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/devices-logs
+
         # Gather Test Result
         - name: "Gather Performance Test Results"
           run: |
             cp -r .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/ .perses_gha/check/
             cd .perses_gha/check
             bash gatherResults.sh
-            ls logs/
-#            tail -7 .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/resultsObservedPerformance1.txt > .resultsObservedPerformance1.json
-#            cat .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/resultsObservedPerformance1.txt
-#            echo "--------------------"
-#            cat .resultsObservedPerformance1.json
-
   
         # Check Perses Result
-        - name: "Check perses test result"
+        - name: "Check Test Results"
           run: |
             cp .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/perses-tests.yaml .perses_gha/check/
             cd .perses_gha/check
-            ls
-            ls logs/
             npm install
             npm start
 
@@ -132,11 +125,12 @@ jobs:
 #        - name: "Setup Custom Test"
 #          run: |
 #            cp  .perses-full.yml .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/perses-config.yml
-#            ls ./`cat .perses.yml | yq .custom_test | tr -d '"'`
-#            cd ./`cat .perses.yml | yq .custom_test | tr -d '"'`
+#
+#            ls ./`cat .perses.yml | yq -c ".tests[] | select( .type | contains(\"custom\")) | .config.testPath" | tr -d '"'`
+#            cd ./`cat .perses.yml | yq -c ".tests[] | select( .type | contains(\"custom\")) | .config.testPath" | tr -d '"'`
 #            npm install
 #        # Run Custom Test
 #        - name: "Run Custom Test"
 #          run: |
 #            cd  .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs
-#            node ../../../../`cat perses-config.yml | yq .custom_test | tr -d '"'`
+#            node ../../../../`cat perses-config.yml | yq -c ".tests[] | select( .type | contains(\"custom\")) | tr -d '"'`
