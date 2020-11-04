@@ -133,4 +133,7 @@ jobs:
         - name: "Run Custom Test"
           run: |
             cd  .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs
+            ls
+            echo "------"
+            ls ../../../../
             node ../../../../`cat perses-config.yml | yq -c ".tests[] | select( .type | contains(\"custom\")) | tr -d '"'`
