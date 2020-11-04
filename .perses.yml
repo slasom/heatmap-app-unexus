@@ -50,17 +50,21 @@ time_wait: "2m"
 log_tags:
   - "HeatmapLog"
 
+max_avg_devices: 50000
 
 tests:
   - id: "GUI Performance"
     type: "espresso"
     expect:
-      total_execution:
+      time_execution:
         under: 200
   - id: "InternalPerformance1"
     type: "custom"
     config:
       testPath: "test/mycustompersestest"
+    expect:
+      avg_devices:
+        under: 200
   - id: "Observed Performance1"
     type: "apipecker"
     config:
