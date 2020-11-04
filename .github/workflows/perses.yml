@@ -124,7 +124,7 @@ jobs:
         # Setup Custom Test
         - name: "Setup Custom Test"
           run: |
-            cp  .perses-full.yml .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/perses-config.yml
+            cp  .perses-full.yml .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/devices-logs/perses-config.yml
 
             ls ./`cat .perses.yml | yq -c ".tests[] | select( .type | contains(\"custom\")) | .config.testPath" | tr -d '"'`
             cd ./`cat .perses.yml | yq -c ".tests[] | select( .type | contains(\"custom\")) | .config.testPath" | tr -d '"'`
@@ -132,7 +132,7 @@ jobs:
         # Run Custom Test
         - name: "Run Custom Test"
           run: |
-            cd  .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs
+            cd  .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/devices-logs/
             ls
             echo "------"
             ls ../../../../
