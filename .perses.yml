@@ -61,7 +61,7 @@ tests:
   - id: "InternalPerformance1"
     type: "custom"
     config:
-      testPath: "test/mycustompersestest"
+      testPath: "test/perses"
     expect:
       avg_devices:
         under: 200
