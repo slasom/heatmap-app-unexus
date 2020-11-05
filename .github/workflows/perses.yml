@@ -119,13 +119,16 @@ jobs:
         # Save Perses Result
         - name: Pushes test file
           uses: dmnemec/copy_file_to_another_repo_action@v1.0.4
+          env:
+            API_TOKEN_GITHUB: ${{ secrets.PERSES_PAT }}
           with:
             source_file: .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/
             destination_repo: 'slasom/persesResults'
             destination_folder: ${{steps.generate-project-id.outputs.result}}
             user_name: 'slasom'
+            user_email: 'slasoman@alumnos.unex.es'
             commit_message: 'A custom message for the commit'
-#              user_email: 'example@email.com'
+#
 
 #        # Setup yq parser for obtaing custom tests path
 #        - name: "Setup parser for custom tests"
