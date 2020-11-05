@@ -116,13 +116,17 @@ jobs:
             npm install
             npm start
 
+        - name: "Pre Save Results"
+            run: |
+              ls .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/
+
         # Save Perses Result
         - name: Pushes test file
           uses: dmnemec/copy_file_to_another_repo_action@v1.0.4
           env:
             API_TOKEN_GITHUB: ${{ secrets.PERSES_PAT }}
           with:
-            source_file: .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/
+            source_file: -r .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/
             destination_repo: 'slasom/persesResults'
             destination_folder: ${{steps.generate-project-id.outputs.result}}
             user_name: 'slasom'
