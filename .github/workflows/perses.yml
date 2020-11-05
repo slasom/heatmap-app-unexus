@@ -117,8 +117,8 @@ jobs:
             npm start
 
         - name: "Pre Save Results"
-            run: |
-              ls .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/
+          run: |
+            ls .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/
 
         # Save Perses Result
         - name: Pushes test file
@@ -129,8 +129,8 @@ jobs:
             source_file: -r .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/
             destination_repo: 'slasom/persesResults'
             destination_folder: ${{steps.generate-project-id.outputs.result}}
-            user_name: 'slasom'
             user_email: 'slasoman@alumnos.unex.es'
+            user_name: 'slasom'
             commit_message: 'A custom message for the commit'
 #
 
