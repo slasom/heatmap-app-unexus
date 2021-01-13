@@ -49,6 +49,7 @@ devices:
       cpu: "2.5"
       ram: "4g"
 
+
 #Application Id of Android App (can find it in the 'build.graddle' file of the application).
 application_id: "com.spilab.heatmapv3"
 
