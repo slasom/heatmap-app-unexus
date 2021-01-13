@@ -44,7 +44,7 @@ devices:
   - id: "Medium Devices"
     type: "mobile"
     devices: 2
-    android_version: 10
+    android_version: 9
     hardware:
       cpu: "2.5"
       ram: "4g"
