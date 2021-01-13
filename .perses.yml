@@ -8,7 +8,6 @@ author: "spilab"
 
 ######### EC2 Configuration #########
 
-
 #Instance AWS type: Only compatible with machines that support kvm virtualization -> https://help.ubuntu.com/community/KVM/Installation.
 instance_type: "c5.metal"
 
@@ -17,14 +16,8 @@ region: "eu-west-1"
 
 ######### Environment Configuration #########
 
-#APK path
-#apk_path: "C:/Users/usuario1/Downloads/testing-samples-master/ui/espresso/BasicSample/app/build/outputs/apk/debug/app-debug.apk"
-
-#APK Debug path. This apk is generated in the application directories and contains the instrumentation tests (espresso).
-#apk_test_path: "C:/Users/usuario1/Downloads/testing-samples-master/ui/espresso/BasicSample/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk"
-
 #Numbers of Android devices to deploy
-number_devices: "2"
+number_devices: "20"
 
 #Maximum CPU: maximum amount of available CPU resources each device can use
 #(We recommend a minimum of 1.5)
