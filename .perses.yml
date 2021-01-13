@@ -16,26 +16,45 @@ region: "eu-west-1"
 
 ######### Environment Configuration #########
 
-#Numbers of Android devices to deploy
-number_devices: "20"
 
-#Maximum CPU: maximum amount of available CPU resources each device can use
-#(We recommend a minimum of 1.5)
-cpu_devices: "2"
+  #### Set of devices ####
 
-#Maximum RAM:  maximum amount of memory each device can use
-#(We recommend a minimum of 3g '3GB').
-ram_devices: "4g"
+  # Id: Name of set of devices
 
-#Android version to use (6 to 10).
-android_version: "9"
+  # Type: mobile
+
+  # Devices: numbers of Android devices to deploy
+
+  # #Android version: You can select 6 to 11.
+
+  # CPU:  maximum amount of available CPU resources each device can use
+  # #(We recommend a minimum of 1.5)
+
+  # RAM:  maximum amount of memory each device can use
+# #(We recommend a minimum of 3g '3GB').
+
+devices:
+  - id: "Basic Devices"
+    type: "mobile"
+    devices: 2
+    android_version: 9
+    hardware:
+      cpu: "2"
+      ram: "4g"
+  - id: "Medium Devices"
+    type: "mobile"
+    devices: 2
+    android_version: 10
+    hardware:
+      cpu: "2"
+      ram: "4g"
 
 #Application Id of Android App (can find it in the 'build.graddle' file of the application).
 application_id: "com.spilab.heatmapv3"
 
 #Time to wait for the deployment of Android devices (1m '1 minute', 1h '1 hour')
 #For example, for deploy 50 devices, wait 20m '20 minutes'
-time_wait: "2m"
+time_wait: "4m"
 
 
 ######### Logs Configuration #########
