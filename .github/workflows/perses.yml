@@ -92,9 +92,9 @@ jobs:
             node index -a tests -n ${{steps.generate-project-id.outputs.result}}
 
         - name: "Perses gets logs from virtual devices"
-            run: |
-              cd .perses_runner
-              node index -a getLogs -n ${{steps.generate-project-id.outputs.result}}
+          run: |
+            cd .perses_runner
+            node index -a getLogs -n ${{steps.generate-project-id.outputs.result}}
 
         - name: "Perses Destroy Infrastructure"
           run: |       
