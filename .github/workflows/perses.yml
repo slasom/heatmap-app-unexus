@@ -55,13 +55,13 @@ jobs:
             cat .perses-credentials.yml
             ls -l .perses-key.pem
         
-        # Get Perser Runner
-        - name: Get Perses Runner
-          uses: actions/checkout@v2
-          with:
-            repository: perses-org/perses
-            token: ${{ secrets.PERSES_PAT }}
-            path: .perses_runner
+#        # Get Perser Runner
+#        - name: Get Perses Runner
+#          uses: actions/checkout@v2
+#          with:
+#            repository: perses-org/perses
+#            token: ${{ secrets.PERSES_PAT }}
+#            path: .perses_runner
 
         - name: "Install dependences"
           run: |       
