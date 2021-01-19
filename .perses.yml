@@ -15,8 +15,6 @@ instance_type: "c5.metal"
 region: "eu-west-1"
 
 ######### Environment Configuration #########
-
-
   #### Set of devices ####
 
   # Id: Name of set of devices
@@ -57,7 +55,7 @@ application_id: "com.spilab.heatmapv3"
 
 #Time to wait for the deployment of Android devices (1m '1 minute', 1h '1 hour')
 #For example, for deploy 50 devices, wait 20m '20 minutes'
-time_wait: "4m"
+time_wait: "9m"
 
 
 ######### Tests Definition #########
