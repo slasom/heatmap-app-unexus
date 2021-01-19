@@ -12,7 +12,7 @@ env:
   
 jobs:
 
-  test:
+  perses-test:
       runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@v2
