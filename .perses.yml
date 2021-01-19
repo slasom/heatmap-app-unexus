@@ -9,7 +9,7 @@ author: "spilab"
 ######### EC2 Configuration #########
 
 #Instance AWS type: Only compatible with machines that support kvm virtualization -> https://help.ubuntu.com/community/KVM/Installation.
-instance_type: "m5.metal"
+instance_type: "c5.metal"
 
 #AWS Region.
 region: "eu-west-1"
@@ -20,34 +20,36 @@ region: "eu-west-1"
   #### Set of devices ####
 
   # Id: Name of set of devices
-
   # Type: mobile
-
   # Devices: numbers of Android devices to deploy
-
   # #Android version: You can select 6 to 11.
-
   # CPU:  maximum amount of available CPU resources each device can use
-  # #(We recommend a minimum of 1.5)
-
+    #(We recommend a minimum of 1.5)
   # RAM:  maximum amount of memory each device can use
-# #(We recommend a minimum of 3g '3GB').
+    #(We recommend a minimum of 3g '3GB').
 
 devices:
   - id: "Basic Devices"
     type: "mobile"
-    devices: 2
+    devices: 8
     android_version: 9
     hardware:
       cpu: "2"
-      ram: "4g"
+      ram: "3g"
   - id: "Medium Devices"
     type: "mobile"
-    devices: 2
+    devices: 8
     android_version: 9
     hardware:
       cpu: "2.5"
       ram: "4g"
+  - id: "Medium Devices"
+      type: "mobile"
+      devices: 8
+      android_version: 10
+      hardware:
+        cpu: "4"
+        ram: "6g"
 
 
 #Application Id of Android App (can find it in the 'build.graddle' file of the application).
@@ -58,12 +60,10 @@ application_id: "com.spilab.heatmapv3"
 time_wait: "4m"
 
 
-######### Logs Configuration #########
+######### Tests Definition #########
 
 log_tags:
   - "HeatmapLog"
-
-max_avg_devices: 50000
 
 tests:
   - id: "GUI Performance"
