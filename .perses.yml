@@ -44,12 +44,12 @@ devices:
       cpu: "2.5"
       ram: "4g"
   - id: "Medium Devices"
-      type: "mobile"
-      devices: 8
-      android_version: 10
-      hardware:
-        cpu: "4"
-        ram: "6g"
+    type: "mobile"
+    devices: 8
+    android_version: 10
+    hardware:
+      cpu: "4"
+      ram: "6g"
 
 
 #Application Id of Android App (can find it in the 'build.graddle' file of the application).
